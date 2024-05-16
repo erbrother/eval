@@ -1,0 +1,20 @@
+{
+  "name": "eva",
+  "version": "1.0.0",
+  "description": "自我评估表达式 解释器（Interpreter）是一种编程工具，它可以将源代码逐行解释并执行。与编译器不同，编译器会将源代码转换成机器语言或者字节码，而解释器则直接执行源代码，将其逐行解释为计算机可理解的指令并执行。",
+  "main": "Environment.js",
+  "scripts": {
+    "test": "node Eva.js"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erbrother/eval.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/erbrother/eval/issues"
+  },
+  "homepage": "https://github.com/erbrother/eval#readme"
+}
