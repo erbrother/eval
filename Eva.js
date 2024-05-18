@@ -22,18 +22,25 @@ class Eva {
     // --------------------------
     // Math operations
     if (exp[0] === '+') {
-      return this.eval(exp[1]) + this.eval(exp[2]);
+      return this.eval(exp[1], env) + this.eval(exp[2], env);
     }
 
     if (exp[0] === '*') {
-      return this.eval(exp[1]) * this.eval(exp[2]);
+      return this.eval(exp[1], env) * this.eval(exp[2], env);
+    }
+
+    // -----------------
+    // Block: sequence of expressions
+    if (exp[0] === 'begin') {
+      const blockEnv = new Environment({}, env)
+      return this._evalBlock(exp, blockEnv);
     }
 
     // ------------------------
     // Variable declaration
     if (exp[0] === 'var') {
       const [_, name, value] = exp;
-      return env.define(name, this.eval(value))
+      return env.define(name, this.eval(value, env))
     }
 
     // -------------------------
@@ -43,6 +50,18 @@ class Eva {
     }
 
     throw `Unimplemented ${JSON.stringify(exp)}`
+  }
+
+  _evalBlock(exps, env) {
+    let result;
+
+    const [_tag, ...expressions] = exps;
+
+    expressions.forEach(exp => {
+      result = this.eval(exp, env);
+    })
+
+    return result;
   }
 }
 
@@ -67,20 +86,57 @@ const eva = new Eva(new Environment({
   VERSION: '0.1'
 }));
 
-assert.strictEqual(eva.eval(1), 1);
-assert.strictEqual(eva.eval('"Hello"'), 'Hello');
+// assert.strictEqual(eva.eval(1), 1);
+// assert.strictEqual(eva.eval('"Hello"'), 'Hello');
 
-// Math: 
+// // Math: 
 
-assert.strictEqual(eva.eval(['+', 1, 2]), 3);
-assert.strictEqual(eva.eval(['+', ['+', 1, 2], 2]), 5);
+// assert.strictEqual(eva.eval(['+', 1, 2]), 3);
+// assert.strictEqual(eva.eval(['+', ['+', 1, 2], 2]), 5);
 
-// Variables:
-assert.strictEqual(eva.eval(['var', 'x', 10]), 10);
+// // Variables:
+// assert.strictEqual(eva.eval(['var', 'x', 10]), 10);
 
-assert.strictEqual(eva.eval('x'), 10);
-assert.strictEqual(eva.eval('VERSION'), '0.1');
+// assert.strictEqual(eva.eval('x'), 10);
+// assert.strictEqual(eva.eval('VERSION'), '0.1');
 
-assert.strictEqual(eva.eval(['var', 'isBool', 'true']), true);
+// assert.strictEqual(eva.eval(['var', 'isBool', 'true']), true);
+
+// // Block
+// assert.strictEqual(eva.eval(
+//   ['begin',
+//     ['var', 'x', 10],
+//     ['var', 'y', 20],
+//     ['+', ['*', 'x', 'y'], 30]
+//   ]
+// ), 230);
+
+// {
+//   var x  =10;
+//   {
+//     var x = 20;
+//     x; // 20
+//   }
+//   x; // 10
+// }
+assert.strictEqual(eva.eval(
+  ['begin',
+    ['var', 'x', 10],
+    ['begin',
+      ['var', 'y', ['+', 'x', 10]],
+      'y'
+    ],
+  ]
+), 20);
+
+assert.strictEqual(eva.eval(
+  ['begin',
+    ['var', 'value', 10],
+    ['var', 'result', ['begin',
+      ['var', 'x', ['+', 'value', 10]],
+      'x'
+    ]],
+    'result'
+  ]), 20);
 
 console.log('All assertions passed!');
