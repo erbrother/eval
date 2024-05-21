@@ -11,7 +11,7 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}/Eva.js"
+      "program": "${workspaceFolder}/__tests__/run.js"
     }
   ]
 }

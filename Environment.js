@@ -31,6 +31,15 @@ class Environment {
 
     return this.parent.resolve(name);
   }
+
+  /**
+   * Updates an existing variable
+   */
+  assign(name, value) {
+    this.resolve(name).record[name] = value;
+
+    return value;
+  }
 }
 
 module.exports = Environment;
