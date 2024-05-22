@@ -3,7 +3,7 @@ const Environment = require('./Environment')
  * Eva interpreter
  */
 class Eva {
-  constructor(global = new Environment()) {
+  constructor(global = GlobalEnviroment) {
     this.global = global;
   }
 
@@ -17,43 +17,6 @@ class Eva {
     if (isString(exp)) {
       return exp.slice(1, -1);
     }
-
-    // --------------------------
-    // Math operations
-    if (exp[0] === '+') {
-      return this.eval(exp[1], env) + this.eval(exp[2], env);
-    }
-
-    if (exp[0] === '*') {
-      return this.eval(exp[1], env) * this.eval(exp[2], env);
-    }
-
-    // --------------------
-    // comparison operators
-    if (exp[0] === '>') {
-      return this.eval(exp[1], env) > this.eval(exp[2], env)
-    }
-
-    if (exp[0] === '>=') {
-      return this.eval(exp[1], env) >= this.eval(exp[2], env)
-    }
-
-    if (exp[0] === '<') {
-      return this.eval(exp[1], env) < this.eval(exp[2], env)
-    }
-
-    if (exp[0] === '<=') {
-      return this.eval(exp[1], env) <= this.eval(exp[2], env)
-    }
-
-    if (exp[0] === '==') {
-      return this.eval(exp[1], env) == this.eval(exp[2], env)
-    }
-
-    if (exp[0] === '===') {
-      return this.eval(exp[1], env) === this.eval(exp[2], env)
-    }
-
 
     // -----------------
     // Block: sequence of expressions
@@ -105,6 +68,20 @@ class Eva {
       return result;
     }
 
+    // -------------------
+    // Function calls
+    if (Array.isArray(exp)) {
+      const fn = this.eval(exp[0], env);
+
+      const args = exp
+        .slice(1)
+        .map(arg => this.eval(arg, env));
+
+      // 1. Native function
+      if (typeof fn == 'function') {
+        return fn(...args)
+      }
+    }
 
     throw `Unimplemented ${JSON.stringify(exp)}`
   }
@@ -131,7 +108,52 @@ function isString(exp) {
 }
 
 function isVariableName(exp) {
-  return typeof exp === 'string' && /^[a-zA-Z][a-zA-Z0-9_]*$/.test(exp);
+  return typeof exp === 'string' && /^[+\-*/<>=a-zA-Z0-9_]*$/.test(exp);
 }
+
+/**
+ * Defualt Global Environment
+ */
+const GlobalEnviroment = new Environment({
+  null: null,
+  true: true,
+  false: false,
+  VERSION: '0.1',
+  '+'(op1, op2) {
+    return op1 + op2
+  },
+  '*'(op1, op2) {
+    return op1 * op2
+  },
+  '-'(op1, op2 = null) {
+    if (op2 == null) {
+      return -op1
+    }
+    return op1 - op2
+  },
+  '/'(op1, op2) {
+    return op1 / op2
+  },
+
+  // comparison
+  '>'(op1, op2) {
+    return op1 > op2
+  },
+  '<'(op1, op2) {
+    return op1 < op2
+  },
+  '>='(op1, op2) {
+    return op1 >= op2
+  },
+  '<='(op1, op2) {
+    return op1 <= op2
+  },
+  '=='(op1, op2) {
+    return op1 == op2
+  },
+  print(...args) {
+    console.log(...args)
+  }
+})
 
 module.exports = Eva;
