@@ -7,7 +7,8 @@ const tests = [
   // require('./self-eval-test'),
   // require('./variables-test'),
   // require('./if-test'),
-  require('./build-in-function-test.js')
+  // require('./build-in-function-test.js'),
+  require('./user-defined-function-test.js'),
 ]
 
 const eva = new Eva();
