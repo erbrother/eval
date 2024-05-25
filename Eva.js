@@ -83,6 +83,18 @@ class Eva {
       return env.define(name, fn)
     }
 
+    // ----------------
+    // Lambda function:(lambda (x) (* x y))
+    if (exp[0] === 'lambda') {
+      const [_tag, params, body] = exp;
+
+      return {
+        params,
+        body,
+        env // the environment where the function is defined Closure
+      }
+    }
+
     // -------------------
     // Function calls
     if (Array.isArray(exp)) {
