@@ -9,6 +9,14 @@ module.exports = eva => {
       ['square', 2]
     ]
   ), 4);
+
+  // Recursive function: 
+  assert.strictEqual(eva.eval(
+    ['begin',
+      ['def', 'factorial', ['n'],
+        ['if', ['==', 'n', 1], 1, ['*', 'n', ['factorial', ['-', 'n', 1]]]]
+      ],
+      ['factorial', 5]
+    ]
+  ), 120);
 }
-
-
